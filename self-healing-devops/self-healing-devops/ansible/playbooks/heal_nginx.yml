@@ -1,0 +1,22 @@
+- name: Self-heal NGINX container
+  hosts: localhost
+  gather_facts: false
+  vars:
+    docker_sock: "/var/run/docker.sock"
+  tasks:
+    - name: Check Docker socket exists (container must mount it)
+      ansible.builtin.stat:
+        path: "{{ docker_sock }}"
+      register: dockersock
+
+    - name: Fail if Docker socket not mounted
+      ansible.builtin.fail:
+        msg: "Docker socket not found at {{ docker_sock }}. Mount it into the webhook container."
+      when: not dockersock.stat.exists
+
+    - name: Restart NGINX container
+      community.docker.docker_container:
+        name: "nginx"
+        state: started
+        restart: true
+        docker_host: "unix://{{ docker_sock }}"

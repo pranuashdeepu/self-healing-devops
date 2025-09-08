@@ -1,0 +1,11 @@
+groups:
+  - name: selfhealing_rules
+    rules:
+      - alert: NginxDown
+        expr: probe_success{instance="http://nginx:80"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Nginx is DOWN"
+          description: "HTTP probe to NGINX failed for more than 30s."

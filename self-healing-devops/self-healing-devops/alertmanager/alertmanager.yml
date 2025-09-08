@@ -1,0 +1,15 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: 'selfheal-webhook'
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 30m
+
+receivers:
+  - name: 'selfheal-webhook'
+    webhook_configs:
+      - url: 'http://webhook:5001/alert'
+        send_resolved: true
